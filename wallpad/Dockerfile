@@ -1,23 +1,17 @@
-FROM python:3
+ARG BUILD_FROM
+FROM $BUILD_FROM
 
 ENV LANG C.UTF-8
-
 # Copy data for add-on
 COPY run.sh /
 COPY js /js
-
 WORKDIR /share
 
 # Install requirements for add-on
-RUN apt-get update && apt-get -y install jq
-RUN python3 -m pip install pyserial && \
-        python3 -m pip install paho-mqtt
-
-
-WORKDIR /
-COPY package.json /
-RUN npm install
+RUN apk add --no-cache jq npm make gcc g++ python3 linux-headers udev \
+&& npm init -f
 
 RUN chmod a+x /run.sh
 
-CMD [ "/run.sh" ]
+# CMD [ "/run.sh" ]
+ENTRYPOINT [ "/run.sh" ]
